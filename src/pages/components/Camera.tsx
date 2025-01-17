@@ -1,3 +1,8 @@
+// Camera code from:
+// https://srivastavayushmaan1347.medium.com/how-to-access-camera-and-capture-photos-using-javascript-80bf7b53b45d
+// and
+// https://www.studytonight.com/post/capture-photo-using-webcam-in-javascript
+
 import React from 'react';
 import './Camera.css';
 
