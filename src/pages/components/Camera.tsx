@@ -1,13 +1,19 @@
 import React from 'react';
 
+const dbg = (a: any) => {
+  console.trace('dev:', a);
+  return a;
+};
+
 export default function Camera({}) {
   const video = React.createRef<HTMLVideoElement>();
   const canvas = React.createRef<HTMLCanvasElement>();
   const photo = React.createRef<HTMLImageElement>();
 
-  const [width, setWidth] = React.useState(320);
-  const [height, setHeight] = React.useState(0);
   const [streaming, setStreaming] = React.useState(false);
+  const [data, setData] = React.useState('');
+  const [width, setWidth] = React.useState(0);
+  const [height, setHeight] = React.useState(0);
 
   React.useEffect(() => {
     // access video stream from webcam
@@ -18,9 +24,9 @@ export default function Camera({}) {
       })
       // on success, stream it in video tag
       .then(function (stream) {
-        if (video instanceof HTMLVideoElement) {
-          video.srcObject = stream;
-          video.play();
+        if (video.current instanceof HTMLVideoElement && stream) {
+          video.current.srcObject = stream;
+          video.current.play();
         }
       })
       .catch(function (err) {
@@ -28,41 +34,37 @@ export default function Camera({}) {
       });
   }, []);
 
-  function canplay(ev: React.SyntheticEvent<HTMLVideoElement>) {
-    if (!streaming) {
-      // @ts-expect-error: TODO: maybe it doesn't exist?
-      setHeight(video.videoHeight / (video.videoWidth / width));
-
-      if (isNaN(height)) {
-        setHeight(width / (4 / 3));
-      }
-
-      // @ts-expect-error: TODO: maybe it doesn't exist?
-      video.setAttribute('width', width);
-      // @ts-expect-error: TODO: maybe it doesn't exist?
-      video.setAttribute('height', height);
-      // @ts-expect-error: TODO: maybe it doesn't exist?
-      canvas.setAttribute('width', width);
-      // @ts-expect-error: TODO: maybe it doesn't exist?
-      canvas.setAttribute('height', height);
+  function canplay() {
+    if (
+      video.current instanceof HTMLVideoElement &&
+      canvas.current instanceof HTMLCanvasElement &&
+      !streaming
+    ) {
       setStreaming(true);
     }
   }
 
   function takepicture() {
     if (
-      canvas instanceof HTMLCanvasElement &&
-      photo instanceof HTMLImageElement
+      canvas.current instanceof HTMLCanvasElement &&
+      photo.current instanceof HTMLImageElement &&
+      video.current instanceof HTMLVideoElement
     ) {
-      var context = canvas.getContext('2d');
-      if (context && width && height) {
-        canvas.width = width;
-        canvas.height = height;
-        // @ts-expect-error: TODO: this should work
-        context.drawImage(video, 0, 0, width, height);
+      setWidth(video.current.videoWidth);
+      setHeight(video.current.videoHeight);
 
-        var data = canvas.toDataURL('image/png');
-        photo.setAttribute('src', data);
+      var context = canvas.current.getContext('2d');
+      if (context) {
+        context.drawImage(
+          video.current,
+          0,
+          0,
+          canvas.current.width,
+          canvas.current.height,
+        );
+
+        setData(canvas.current.toDataURL('image/png'));
+        console.log('dev: picture');
       } else {
         clearphoto();
       }
@@ -76,22 +78,21 @@ export default function Camera({}) {
 
   function clearphoto() {
     if (
-      canvas instanceof HTMLCanvasElement &&
-      photo instanceof HTMLImageElement
+      canvas.current instanceof HTMLCanvasElement &&
+      photo.current instanceof HTMLImageElement
     ) {
-      const context = canvas.getContext('2d')!;
+      const context = canvas.current.getContext('2d')!;
       context.fillStyle = '#AAA';
-      context.fillRect(0, 0, canvas.width, canvas.height);
+      context.fillRect(0, 0, canvas.current.width, canvas.current.height);
 
-      const data = canvas.toDataURL('image/png');
-      photo.setAttribute('src', data);
+      setData(canvas.current.toDataURL('image/png'));
     }
   }
 
   return (
     <div className="container flex flex-col items-center">
       <div className="camera border border-black">
-        <video id="video" onCanPlay={canplay}>
+        <video id="video" onCanPlay={canplay} ref={video}>
           Video stream not available.
         </video>
       </div>
@@ -101,9 +102,16 @@ export default function Camera({}) {
         </button>
       </div>
 
-      <canvas id="canvas"></canvas>
+      <canvas id="canvas" ref={canvas} width={width} height={height}></canvas>
       <div className="output">
-        <img id="photo" alt="The screen capture will appear in this box." />
+        <img
+          id="photo"
+          alt="The screen capture will appear in this box."
+          ref={photo}
+          src={data}
+          width={width}
+          height={height}
+        />
       </div>
     </div>
   );
