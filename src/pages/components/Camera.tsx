@@ -5,6 +5,7 @@
 
 import React from 'react';
 import './Camera.css';
+import { api } from '~/utils/api';
 
 const dbg = (a: any) => {
   console.trace('dev:', a);
@@ -20,6 +21,8 @@ export default function Camera({}) {
   const [data, setData] = React.useState('');
   const [width, setWidth] = React.useState(0);
   const [height, setHeight] = React.useState(0);
+
+  const req = api.post.ask.useMutation();
 
   React.useEffect(() => {
     navigator.mediaDevices
@@ -82,6 +85,10 @@ export default function Camera({}) {
 
         const data = dbg(canvas.current.toDataURL('image/png'));
         setData(data);
+
+        if (data !== 'data:.' && data.startsWith('data:')) {
+          req.mutate({ image: data });
+        }
       } else {
         clearphoto();
       }
@@ -129,6 +136,15 @@ export default function Camera({}) {
         width={width}
         height={height}
       />
+
+      <div>
+        <h2>Response</h2>
+        <pre>
+          {req.error
+            ? JSON.stringify(req.error, null, 2)
+            : JSON.stringify(req.data, null, 2)}
+        </pre>
+      </div>
     </div>
   );
 }

@@ -8,7 +8,7 @@ const zQuestion = z.object({
 });
 
 export const questionRouter = createTRPCRouter({
-  ask: publicProcedure.input(zQuestion).query(async ({ input }) => {
+  ask: publicProcedure.input(zQuestion).mutation(async ({ input }) => {
     const chatCompletion = await openai.chat.completions.create({
       messages: [
         {
