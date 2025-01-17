@@ -16,13 +16,11 @@ export default function Camera({}) {
   const [height, setHeight] = React.useState(0);
 
   React.useEffect(() => {
-    // access video stream from webcam
     navigator.mediaDevices
       .getUserMedia({
         video: true,
         audio: false,
       })
-      // on success, stream it in video tag
       .then(function (stream) {
         if (video.current instanceof HTMLVideoElement && stream) {
           video.current.srcObject = stream;
@@ -64,7 +62,7 @@ export default function Camera({}) {
         );
 
         setData(canvas.current.toDataURL('image/png'));
-        console.log('dev: picture');
+        console.log({ data });
       } else {
         clearphoto();
       }
@@ -82,7 +80,7 @@ export default function Camera({}) {
       photo.current instanceof HTMLImageElement
     ) {
       const context = canvas.current.getContext('2d')!;
-      context.fillStyle = '#AAA';
+      context.fillStyle = '#f00';
       context.fillRect(0, 0, canvas.current.width, canvas.current.height);
 
       setData(canvas.current.toDataURL('image/png'));
@@ -103,16 +101,14 @@ export default function Camera({}) {
       </div>
 
       <canvas id="canvas" ref={canvas} width={width} height={height}></canvas>
-      <div className="output">
-        <img
-          id="photo"
-          alt="The screen capture will appear in this box."
-          ref={photo}
-          src={data}
-          width={width}
-          height={height}
-        />
-      </div>
+      <img
+        id="photo"
+        alt="The screen capture will appear in this box."
+        ref={photo}
+        src={data}
+        width={width}
+        height={height}
+      />
     </div>
   );
 }
