@@ -1,4 +1,5 @@
 import React from 'react';
+import './Camera.css';
 
 const dbg = (a: any) => {
   console.trace('dev:', a);
@@ -23,8 +24,21 @@ export default function Camera({}) {
       })
       .then(function (stream) {
         if (video.current instanceof HTMLVideoElement && stream) {
-          video.current.srcObject = stream;
-          video.current.play();
+          try {
+            video.current.srcObject = stream;
+            video.current
+              .play()
+              .then(() => {
+                console.log('play');
+              })
+              .catch((e) => {
+                // Catching this for now
+                console.error('play error:', e);
+              });
+          } catch (e) {
+            // Catching this for now
+            console.error('An error occurred: ' + e);
+          }
         }
       })
       .catch(function (err) {
@@ -61,8 +75,8 @@ export default function Camera({}) {
           canvas.current.height,
         );
 
-        setData(canvas.current.toDataURL('image/png'));
-        console.log({ data });
+        const data = dbg(canvas.current.toDataURL('image/png'));
+        setData(data);
       } else {
         clearphoto();
       }
@@ -70,6 +84,7 @@ export default function Camera({}) {
   }
 
   function onClick(ev: React.MouseEvent<HTMLButtonElement>) {
+    clearphoto();
     takepicture();
     ev.preventDefault();
   }
@@ -95,7 +110,7 @@ export default function Camera({}) {
         </video>
       </div>
       <div>
-        <button id="startbutton" onClick={onClick}>
+        <button id="startbutton" className="btn btn-blue" onClick={onClick}>
           Take photo
         </button>
       </div>
