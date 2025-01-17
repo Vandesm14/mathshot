@@ -25,6 +25,8 @@ export default function Camera({}) {
   const req = api.post.ask.useMutation();
 
   React.useEffect(() => {
+    if (typeof window === 'undefined') return;
+
     navigator.mediaDevices
       .getUserMedia({
         video: true,
@@ -83,11 +85,12 @@ export default function Camera({}) {
           canvas.current.height,
         );
 
-        const data = dbg(canvas.current.toDataURL('image/png'));
-        setData(data);
+        let image = dbg(canvas.current.toDataURL('image/png'));
+        image = dbg(canvas.current.toDataURL('image/png'));
+        setData(image);
 
-        if (data !== 'data:.' && data.startsWith('data:')) {
-          req.mutate({ image: data });
+        if (image !== 'data:.' && image.startsWith('data:')) {
+          req.mutate({ image });
         }
       } else {
         clearphoto();
