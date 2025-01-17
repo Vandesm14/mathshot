@@ -85,8 +85,7 @@ export default function Camera({}) {
           canvas.current.height,
         );
 
-        let image = dbg(canvas.current.toDataURL('image/png'));
-        image = dbg(canvas.current.toDataURL('image/png'));
+        const image = dbg(canvas.current.toDataURL('image/png'));
         setData(image);
 
         if (image !== 'data:.' && image.startsWith('data:')) {
