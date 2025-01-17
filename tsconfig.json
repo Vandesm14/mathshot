@@ -23,6 +23,16 @@
     "plugins": [{ "name": "next" }],
     "incremental": true,
 
+    "allowUnusedLabels": false,
+    "allowUnreachableCode": false,
+    "exactOptionalPropertyTypes": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+
     /* Path Aliases */
     "baseUrl": ".",
     "paths": {
