@@ -40,6 +40,11 @@ export default function Camera({}) {
               .play()
               .then(() => {
                 console.log('play');
+
+                if (video.current instanceof HTMLVideoElement) {
+                  setWidth(video.current.videoWidth);
+                  setHeight(video.current.videoHeight);
+                }
               })
               .catch((e) => {
                 // Catching this for now
@@ -72,9 +77,6 @@ export default function Camera({}) {
       photo.current instanceof HTMLImageElement &&
       video.current instanceof HTMLVideoElement
     ) {
-      setWidth(video.current.videoWidth);
-      setHeight(video.current.videoHeight);
-
       var context = canvas.current.getContext('2d');
       if (context) {
         context.drawImage(
