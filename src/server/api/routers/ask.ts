@@ -26,26 +26,27 @@ export async function runPython(
   let logs = '';
   let timedOut = false;
 
-  // const timeoutPromise = new Promise<never>((_, reject) => {
-  //   setTimeout(async () => {
-  //     timedOut = true;
-  //     console.log('Container timed out');
-  //     try {
-  //       await execPromise(`docker kill ${containerName}`);
-  //     } catch (e) {
-  //       console.error('Error killing container:', e);
-  //     }
-  //     reject(new Error(`Container timed out after ${timeoutMs} ms`));
-  //   }, timeoutMs);
-  // });
+  const timeoutPromise = () =>
+    new Promise<never>((_, reject) => {
+      setTimeout(async () => {
+        timedOut = true;
+        console.log('Container timed out');
+        try {
+          await execPromise(`docker kill ${containerName}`);
+        } catch (e) {
+          console.error('Error killing container:', e);
+        }
+        reject(new Error(`Container timed out after ${timeoutMs} ms`));
+      }, timeoutMs);
+    });
 
   try {
     console.log('Running command:', command);
-    // const { stdout, stderr } = await Promise.race([
-    //   execPromise(command),
-    //   timeoutPromise,
-    // ]);
-    const { stdout, stderr } = await execPromise(command);
+    const { stdout, stderr } = await Promise.race([
+      execPromise(command),
+      timeoutPromise(),
+    ]);
+    // const { stdout, stderr } = await execPromise(command);
     logs = stdout + stderr;
     console.log('Logs:', logs);
   } catch (err) {
@@ -93,7 +94,7 @@ export const questionRouter = createTRPCRouter({
       console.error('Error with OpenAI:', e);
 
       // TODO: show a better error
-      return { pythonLogs: 'Error with OpenAI' };
+      return 'Error with OpenAI';
     }
 
     let result = chatCompletion.choices[0]?.message.content;

@@ -116,6 +116,16 @@ export default function Camera({}) {
     }
   }
 
+  const result = React.useMemo(() => {
+    if (req.error) {
+      return `Error: ${req.error}`;
+    } else if (req.data) {
+      return req.data.split('\n').map((el) => <p>{el}</p>);
+    }
+
+    return '';
+  }, [req.data, req.error]);
+
   return (
     <div className="container flex flex-col items-center">
       <div className="camera border border-black">
@@ -141,11 +151,7 @@ export default function Camera({}) {
 
       <div>
         <h2>Response</h2>
-        <pre>
-          {req.error
-            ? JSON.stringify(req.error, null, 2)
-            : JSON.stringify(req.data, null, 2)}
-        </pre>
+        <div>{result}</div>
       </div>
     </div>
   );
