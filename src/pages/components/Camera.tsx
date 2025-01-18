@@ -93,29 +93,13 @@ export default function Camera({}) {
         if (image !== 'data:.' && image.startsWith('data:')) {
           req.mutate({ image });
         }
-      } else {
-        clearphoto();
       }
     }
   }
 
   function onClick(ev: React.MouseEvent<HTMLButtonElement>) {
-    clearphoto();
     takepicture();
     ev.preventDefault();
-  }
-
-  function clearphoto() {
-    if (
-      canvas.current instanceof HTMLCanvasElement &&
-      photo.current instanceof HTMLImageElement
-    ) {
-      const context = canvas.current.getContext('2d')!;
-      context.fillStyle = '#f00';
-      context.fillRect(0, 0, canvas.current.width, canvas.current.height);
-
-      setData(canvas.current.toDataURL('image/png'));
-    }
   }
 
   const result = React.useMemo(() => {
