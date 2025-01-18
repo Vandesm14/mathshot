@@ -6,6 +6,8 @@
 import React from 'react';
 import './Camera.css';
 import { api } from '~/utils/api';
+import Markdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 const dbg = (a: any) => {
   console.trace('dev:', a);
@@ -103,13 +105,15 @@ export default function Camera({}) {
   }
 
   const result = React.useMemo(() => {
-    if (req.error) {
+    if (req.isPending) {
+      return 'Loading...';
+    } else if (req.error) {
       return `Error: ${req.error}`;
     } else if (req.data) {
-      return req.data.split('\n').map((el) => <p>{el}</p>);
+      return <Markdown remarkPlugins={[remarkGfm]}>{req.data}</Markdown>;
     }
 
-    return '';
+    return 'Request failed, try again.';
   }, [req.data, req.error]);
 
   return (
@@ -135,10 +139,7 @@ export default function Camera({}) {
         height={height}
       />
 
-      <div>
-        <h2>Response</h2>
-        <div>{result}</div>
-      </div>
+      <div>{result}</div>
     </div>
   );
 }
