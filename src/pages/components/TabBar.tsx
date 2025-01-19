@@ -98,7 +98,22 @@ export default function TabBar({}) {
         ) : null}
       </TabPanel>
       <TabPanel>
-        {showTimer ? <Loader endAt={endAt} /> : <div>{result}</div>}
+        {showTimer ? (
+          <Loader endAt={endAt} />
+        ) : (
+          <div>
+            {image && width && height ? (
+              <img
+                id="photo"
+                alt="The screen capture will appear in this box."
+                src={image}
+                width={width}
+                height={height}
+              />
+            ) : null}
+            {result}
+          </div>
+        )}
       </TabPanel>
     </Tabs>
   );
