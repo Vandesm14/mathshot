@@ -1,6 +1,8 @@
 import Head from 'next/head';
 
-import Camera from './components/Camera';
+import TabBar from './components/TabBar';
+
+import './index.css';
 
 export default function Home() {
   return (
@@ -14,7 +16,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex min-h-screen flex-col items-center">
-        <Camera />
+        <TabBar />
       </main>
     </>
   );
