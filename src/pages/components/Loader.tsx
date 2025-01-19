@@ -50,7 +50,7 @@ export default function Loader({ endAt }: { endAt: number }) {
           <div className="text">{Math.round(percent)}%</div>
         </div>
       ) : (
-        <div className="text">Done!</div>
+        <div className="text">Waiting...</div>
       )}
     </div>
   );

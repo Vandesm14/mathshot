@@ -1,10 +1,74 @@
+import React from 'react';
+
+import Camera, { OnCapture } from './Camera';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
-import Camera from './Camera';
+
+import Markdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+
+import { api } from '~/utils/api';
+import Loader from './Loader';
 
 export default function TabBar({}) {
+  const [index, setIndex] = React.useState(0);
+
+  const [image, setImage] = React.useState<string | null>(null);
+  const [width, setWidth] = React.useState<number | null>(null);
+  const [height, setHeight] = React.useState<number | null>(null);
+
+  const [endAt, setEndAt] = React.useState(0);
+  const [showTimer, setShowTimer] = React.useState(false);
+
+  const req = api.post.ask.useMutation();
+
+  function onCapture(d: OnCapture) {
+    setImage(d.image);
+    setWidth(d.width);
+    setHeight(d.height);
+
+    req.mutate({
+      image: d.image,
+    });
+
+    setIndex(1);
+  }
+
+  function onCancel() {
+    setImage(null);
+    setWidth(null);
+    setHeight(null);
+
+    setIndex(0);
+  }
+
+  function onConfirm() {
+    setIndex(2);
+
+    if (image) {
+      req.mutate({ image });
+      setEndAt(Date.now() + 1000 * 10);
+    }
+  }
+
+  const result = React.useMemo(() => {
+    console.log('rerender');
+    if (req.isPending) {
+      setShowTimer(true);
+      return 'Loading...';
+    } else if (req.error) {
+      setShowTimer(false);
+      return `Error: ${req.error}`;
+    } else if (req.data) {
+      setShowTimer(false);
+      return <Markdown remarkPlugins={[remarkGfm]}>{req.data}</Markdown>;
+    }
+
+    return 'Take a photo to get started.';
+  }, [req.isPending, req.error, req.data]);
+
   return (
-    <Tabs>
+    <Tabs selectedIndex={index} onSelect={(i) => setIndex(i)}>
       <TabList>
         <Tab>Camera</Tab>
         <Tab>Picture</Tab>
@@ -12,13 +76,29 @@ export default function TabBar({}) {
       </TabList>
 
       <TabPanel>
-        <Camera />
+        <Camera onCapture={onCapture} />
       </TabPanel>
       <TabPanel>
-        <h2>Any content 2</h2>
+        {image && width && height ? (
+          <>
+            <img
+              id="photo"
+              alt="The screen capture will appear in this box."
+              src={image}
+              width={width}
+              height={height}
+            />
+            <button className="btn btn-red" onClick={onCancel}>
+              Retake
+            </button>
+            <button className="btn btn-blue" onClick={onConfirm}>
+              Confirm
+            </button>
+          </>
+        ) : null}
       </TabPanel>
       <TabPanel>
-        <h2>Any content 3</h2>
+        {showTimer ? <Loader endAt={endAt} /> : <div>{result}</div>}
       </TabPanel>
     </Tabs>
   );

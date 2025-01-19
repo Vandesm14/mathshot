@@ -5,24 +5,24 @@
 
 import React from 'react';
 import './Camera.css';
-import { api } from '~/utils/api';
-import Markdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import Loader from './Loader';
 
-export default function Camera({}) {
+export type OnCapture = {
+  image: string;
+  width: number;
+  height: number;
+};
+
+export default function Camera({
+  onCapture,
+}: {
+  onCapture?: (d: OnCapture) => void;
+}) {
   const video = React.createRef<HTMLVideoElement>();
   const canvas = React.createRef<HTMLCanvasElement>();
-  const photo = React.createRef<HTMLImageElement>();
 
   const [streaming, setStreaming] = React.useState(false);
-  const [data, setData] = React.useState('');
   const [width, setWidth] = React.useState(0);
   const [height, setHeight] = React.useState(0);
-  const [endAt, setEndAt] = React.useState(0);
-  const [showTimer, setShowTimer] = React.useState(false);
-
-  const req = api.post.ask.useMutation();
 
   React.useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -72,7 +72,6 @@ export default function Camera({}) {
   function takepicture() {
     if (
       canvas.current instanceof HTMLCanvasElement &&
-      photo.current instanceof HTMLImageElement &&
       video.current instanceof HTMLVideoElement
     ) {
       var context = canvas.current.getContext('2d');
@@ -86,11 +85,8 @@ export default function Camera({}) {
         );
 
         const image = canvas.current.toDataURL('image/png');
-        setData(image);
-
-        if (image !== 'data:.' && image.startsWith('data:')) {
-          req.mutate({ image });
-          setEndAt(Date.now() + 10_000);
+        if (onCapture) {
+          onCapture({ image, width, height });
         }
       }
     }
@@ -100,22 +96,6 @@ export default function Camera({}) {
     takepicture();
     ev.preventDefault();
   }
-
-  const result = React.useMemo(() => {
-    console.log('rerender');
-    if (req.isPending) {
-      setShowTimer(true);
-      return 'Loading...';
-    } else if (req.error) {
-      setShowTimer(false);
-      return `Error: ${req.error}`;
-    } else if (req.data) {
-      setShowTimer(false);
-      return <Markdown remarkPlugins={[remarkGfm]}>{req.data}</Markdown>;
-    }
-
-    return 'Take a photo to get started.';
-  }, [req.isPending, req.error, req.data]);
 
   return (
     <div className="container flex flex-col items-center">
@@ -131,17 +111,6 @@ export default function Camera({}) {
       </div>
 
       <canvas id="canvas" ref={canvas} width={width} height={height}></canvas>
-      <img
-        id="photo"
-        alt="The screen capture will appear in this box."
-        ref={photo}
-        src={data}
-        width={width}
-        height={height}
-      />
-
-      {showTimer ? <Loader endAt={endAt} /> : null}
-      <div>{result}</div>
     </div>
   );
 }
