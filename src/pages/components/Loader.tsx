@@ -1,33 +1,39 @@
 import React from 'react';
+import './Loader.css';
 
 export default function Loader({ endAt }: { endAt: number }) {
-  const [time, setTime] = React.useState(Date.now());
-  const [start, setStart] = React.useState(Date.now());
   const [loading, setLoading] = React.useState(true);
 
   const [percent, setPercent] = React.useState(0);
 
   React.useEffect(() => {
-    setStart(Date.now());
-    setLoading(false);
-  }, [endAt]);
+    const now = Date.now();
+    if (now > endAt) {
+      setLoading(false);
+    } else {
+      setLoading(true);
+    }
+  });
 
   React.useEffect(() => {
-    const interval = setInterval(() => {
-      setTime(Date.now());
-      setPercent(((time - start) / (endAt - start)) * 100);
-    }, 1000);
+    setLoading(false);
+
+    let start = Date.now();
+    const i = setInterval(() => {
+      const now = Date.now();
+      const percent = ((now - start) / (endAt - start)) * 100;
+      setPercent(percent);
+
+      if (now > endAt) {
+        clearInterval(i);
+        setLoading(false);
+      }
+    }, 1000 / 30);
 
     return () => {
-      clearInterval(interval);
+      clearInterval(i);
     };
-  }, []);
-
-  React.useEffect(() => {
-    if (time > endAt) {
-      setLoading(false);
-    }
-  }, [time, endAt]);
+  }, [endAt]);
 
   return (
     <div className="loader">

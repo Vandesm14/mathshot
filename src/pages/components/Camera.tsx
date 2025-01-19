@@ -10,11 +10,6 @@ import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import Loader from './Loader';
 
-const dbg = (a: any) => {
-  console.trace('dev:', a);
-  return a;
-};
-
 export default function Camera({}) {
   const video = React.createRef<HTMLVideoElement>();
   const canvas = React.createRef<HTMLCanvasElement>();
@@ -25,6 +20,7 @@ export default function Camera({}) {
   const [width, setWidth] = React.useState(0);
   const [height, setHeight] = React.useState(0);
   const [endAt, setEndAt] = React.useState(0);
+  const [showTimer, setShowTimer] = React.useState(false);
 
   const req = api.post.ask.useMutation();
 
@@ -43,8 +39,6 @@ export default function Camera({}) {
             video.current
               .play()
               .then(() => {
-                console.log('play');
-
                 if (video.current instanceof HTMLVideoElement) {
                   setWidth(video.current.videoWidth);
                   setHeight(video.current.videoHeight);
@@ -91,7 +85,7 @@ export default function Camera({}) {
           canvas.current.height,
         );
 
-        const image = dbg(canvas.current.toDataURL('image/png'));
+        const image = canvas.current.toDataURL('image/png');
         setData(image);
 
         if (image !== 'data:.' && image.startsWith('data:')) {
@@ -108,16 +102,20 @@ export default function Camera({}) {
   }
 
   const result = React.useMemo(() => {
+    console.log('rerender');
     if (req.isPending) {
+      setShowTimer(true);
       return 'Loading...';
     } else if (req.error) {
+      setShowTimer(false);
       return `Error: ${req.error}`;
     } else if (req.data) {
+      setShowTimer(false);
       return <Markdown remarkPlugins={[remarkGfm]}>{req.data}</Markdown>;
     }
 
     return 'Take a photo to get started.';
-  }, [req]);
+  }, [req.isPending, req.error, req.data]);
 
   return (
     <div className="container flex flex-col items-center">
@@ -142,7 +140,7 @@ export default function Camera({}) {
         height={height}
       />
 
-      <Loader endAt={endAt} />
+      {showTimer ? <Loader endAt={endAt} /> : null}
       <div>{result}</div>
     </div>
   );
