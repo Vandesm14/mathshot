@@ -66,6 +66,10 @@ export async function runPython(
 
 export const questionRouter = createTRPCRouter({
   ask: publicProcedure.input(zQuestion).mutation(async ({ input }) => {
+    // Dev: uncomment this for testing
+    // await sleep(5_000);
+    // return 'This is a test';
+
     let chatCompletion: ChatCompletion;
     let messages: ChatCompletionMessageParam[] = [
       {
