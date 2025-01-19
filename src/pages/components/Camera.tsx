@@ -8,6 +8,7 @@ import './Camera.css';
 import { api } from '~/utils/api';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import Loader from './Loader';
 
 const dbg = (a: any) => {
   console.trace('dev:', a);
@@ -23,6 +24,7 @@ export default function Camera({}) {
   const [data, setData] = React.useState('');
   const [width, setWidth] = React.useState(0);
   const [height, setHeight] = React.useState(0);
+  const [endAt, setEndAt] = React.useState(0);
 
   const req = api.post.ask.useMutation();
 
@@ -94,6 +96,7 @@ export default function Camera({}) {
 
         if (image !== 'data:.' && image.startsWith('data:')) {
           req.mutate({ image });
+          setEndAt(Date.now() + 10_000);
         }
       }
     }
@@ -113,8 +116,8 @@ export default function Camera({}) {
       return <Markdown remarkPlugins={[remarkGfm]}>{req.data}</Markdown>;
     }
 
-    return 'Request failed, try again.';
-  }, [req.data, req.error]);
+    return 'Take a photo to get started.';
+  }, [req]);
 
   return (
     <div className="container flex flex-col items-center">
@@ -139,6 +142,7 @@ export default function Camera({}) {
         height={height}
       />
 
+      <Loader endAt={endAt} />
       <div>{result}</div>
     </div>
   );
