@@ -2,8 +2,6 @@ import Head from 'next/head';
 
 import TabBar from './components/TabBar';
 
-import './index.css';
-
 export default function Home() {
   return (
     <>

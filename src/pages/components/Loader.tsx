@@ -1,5 +1,4 @@
 import React from 'react';
-import './Loader.css';
 
 export default function Loader({ endAt }: { endAt: number }) {
   const [loading, setLoading] = React.useState(true);

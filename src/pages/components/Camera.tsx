@@ -4,7 +4,6 @@
 // https://www.studytonight.com/post/capture-photo-using-webcam-in-javascript
 
 import React from 'react';
-import './Camera.css';
 
 export type OnCapture = {
   image: string;
