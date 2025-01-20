@@ -18,7 +18,7 @@ export default function Loader({ endAt }: { endAt: number }) {
   React.useEffect(() => {
     setLoading(false);
 
-    let start = Date.now();
+    const start = Date.now();
     const i = setInterval(() => {
       const now = Date.now();
       const percent = ((now - start) / (endAt - start)) * 100;

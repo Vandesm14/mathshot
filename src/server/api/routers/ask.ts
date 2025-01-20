@@ -28,15 +28,18 @@ export async function runPython(
 
   const timeoutPromise = () =>
     new Promise<never>((_, reject) => {
-      setTimeout(async () => {
-        timedOut = true;
-        console.log('Container timed out');
-        try {
-          await execPromise(`docker kill ${containerName}`);
-        } catch (e) {
-          console.error('Error killing container:', e);
-        }
-        reject(new Error(`Container timed out after ${timeoutMs} ms`));
+      setTimeout(() => {
+        // An IIFE is used to make @typescript-eslint/no-misused-promises happy.
+        void (async () => {
+          timedOut = true;
+          console.log('Container timed out');
+          try {
+            await execPromise(`docker kill ${containerName}`);
+          } catch (e) {
+            console.error('Error killing container:', e);
+          }
+          reject(new Error(`Container timed out after ${timeoutMs} ms`));
+        })();
       }, timeoutMs);
     });
 
@@ -71,7 +74,7 @@ export const questionRouter = createTRPCRouter({
     // return 'This is a test';
 
     let chatCompletion: ChatCompletion;
-    let messages: ChatCompletionMessageParam[] = [
+    const messages: ChatCompletionMessageParam[] = [
       {
         role: 'user',
         content: [

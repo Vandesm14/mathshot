@@ -49,7 +49,7 @@ export default function Camera({
               });
           } catch (e) {
             // Catching this for now
-            console.error('An error occurred: ' + e);
+            console.error('An error occurred: ', e);
           }
         }
       })
@@ -73,7 +73,7 @@ export default function Camera({
       canvas.current instanceof HTMLCanvasElement &&
       video.current instanceof HTMLVideoElement
     ) {
-      var context = canvas.current.getContext('2d');
+      const context = canvas.current.getContext('2d');
       if (context) {
         context.drawImage(
           video.current,

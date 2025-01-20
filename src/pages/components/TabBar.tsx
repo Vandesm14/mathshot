@@ -54,7 +54,7 @@ export default function TabBar({}) {
       return 'Loading...';
     } else if (req.error) {
       setShowTimer(false);
-      return `Error: ${req.error}`;
+      return `Error: ${JSON.stringify(req.error, null, 2)}`;
     } else if (req.data) {
       setShowTimer(false);
       return <Markdown remarkPlugins={[remarkGfm]}>{req.data}</Markdown>;
