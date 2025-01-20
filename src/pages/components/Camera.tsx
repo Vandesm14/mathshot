@@ -29,8 +29,7 @@ export default function Camera({
 
     navigator.mediaDevices
       .getUserMedia({
-        video: true,
-        audio: false,
+        video: { facingMode: 'environment' },
       })
       .then(function (stream) {
         if (video.current instanceof HTMLVideoElement && stream) {
@@ -104,7 +103,7 @@ export default function Camera({
           Video stream not available.
         </video>
       </div>
-      <div>
+      <div className="flex justify-center gap-2 py-2">
         <button id="startbutton" className="btn btn-blue" onClick={onClick}>
           Take photo
         </button>
