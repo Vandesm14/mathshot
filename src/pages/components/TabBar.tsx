@@ -27,10 +27,6 @@ export default function TabBar({}) {
     setWidth(d.width);
     setHeight(d.height);
 
-    req.mutate({
-      image: d.image,
-    });
-
     setIndex(1);
   }
 
@@ -88,12 +84,14 @@ export default function TabBar({}) {
               width={width}
               height={height}
             />
-            <button className="btn btn-red" onClick={onCancel}>
-              Retake
-            </button>
-            <button className="btn btn-blue" onClick={onConfirm}>
-              Confirm
-            </button>
+            <div className="flex justify-center gap-2 py-2">
+              <button className="btn btn-red" onClick={onCancel}>
+                Retake
+              </button>
+              <button className="btn btn-blue" onClick={onConfirm}>
+                Confirm
+              </button>
+            </div>
           </>
         ) : null}
       </TabPanel>
@@ -101,7 +99,7 @@ export default function TabBar({}) {
         {showTimer ? (
           <Loader endAt={endAt} />
         ) : (
-          <div>
+          <div className="flex flex-col items-center">
             {image && width && height ? (
               <img
                 id="photo"
@@ -112,6 +110,11 @@ export default function TabBar({}) {
               />
             ) : null}
             {result}
+            <div className="py-5">
+              <button className="btn btn-blue" onClick={() => setIndex(0)}>
+                Try another
+              </button>
+            </div>
           </div>
         )}
       </TabPanel>
